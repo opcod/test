@@ -1,3 +1,4 @@
+from threading import Timer
 from selenium import webdriver
 import time
 
@@ -42,10 +43,47 @@ for bt1 in bt1s:
     if bt1.text=='无修改和补充，需进行网络继续教育学习':
         bt1.click()
 
-table=wd.find_elements_by_from_name('table')
-tbody=table.find_element_by_tag_name('tbody')
-trs=tbody.find_elements_by_tag_name('tr')
-for tr in trs:
-    print(tr.text)
+
+wd.get('http://kj.czt.gxzf.gov.cn:7005/gx-eams/Actions/Net/Internal/NetService/ApplyOnlineEduAction.do?method=getOnlinePayInfo&flag=201014085351416')
+
+time.sleep(3)
+
+wd.find_element_by_id('cb_only_show_selected').click()
+
+wd.get('https://ce.esnai.net/c/accguangxi/study.jsp?tid=3736&code=ZFKJZZZDJJ')
+
+wd.get('https://ce.esnai.net/c/public/showflashvideo.jsp?type=1&cwid=3659&tid=3736')
+
+print(wd.title)
+
+wd.find_element_by_css_selector('.pv-controls-left button').click()
+
+wd.find_element_by_css_selector('.pv-controls-right .pv-volumebtn').click()
+#弹窗处理
+def alert():
+    print('正在执行弹窗0')
+    try:
+        wd.find_element_by_css_selector('#examcontent label:nth-of-type(1) input').click()
+        wd.find_element_by_css_selector('#examcontent [value=确定]').click()
+        print('找到弹窗0目标并执行')
+        try:
+            wd.switch_to.alert.accept()
+            print('第一个选项错误了，1秒后将执行弹窗1')
+            Timer(1.0, alert1).start()
+        except:
+            print('弹窗确认出错')
+    except:
+        print('未找到弹窗0目标，30秒重新执行')
+        Timer(30.0,alert).start()
+def alert1():
+    print('正在执行弹窗1')
+    try:
+        wd.find_element_by_css_selector('#examcontent label:nth-of-type(2) input').click()
+        wd.find_element_by_css_selector('#examcontent [value=确定]').click()
+    except:
+        print('未找到弹窗1目标，将执行弹窗0')
+        Timer(30.0, alert).start()
+alert()
+
 # 关闭
-wd.quit()
+# wd.quit()
