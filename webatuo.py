@@ -71,7 +71,8 @@ def alert():
             print('第一个选项错误了，1秒后将执行弹窗1')
             Timer(1.0, alert1).start()
         except:
-            print('弹窗确认出错')
+            print('选项正确，将重新执行弹窗0')
+            Timer(30.0, alert).start()
     except:
         print('未找到弹窗0目标，30秒重新执行')
         Timer(30.0,alert).start()
@@ -80,6 +81,8 @@ def alert1():
     try:
         wd.find_element_by_css_selector('#examcontent label:nth-of-type(2) input').click()
         wd.find_element_by_css_selector('#examcontent [value=确定]').click()
+        print('弹窗1执行结束，将继续执行弹窗0')
+        Timer(30.0, alert).start()
     except:
         print('未找到弹窗1目标，将执行弹窗0')
         Timer(30.0, alert).start()
