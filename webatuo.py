@@ -2,6 +2,9 @@ from threading import Timer
 from selenium import webdriver
 import time
 
+# 命令行中使用以下命令可以批量杀死该驱动
+# taskkill /F /im chromedriver.exe
+
 # 创建 WebDriver 对象，指明使用chrome浏览器驱动
 wd = webdriver.Chrome(r'E:\test\drive\chromedriver.exe')
 # r表示“原始表示”，不转义
@@ -46,19 +49,46 @@ for bt1 in bt1s:
 
 wd.get('http://kj.czt.gxzf.gov.cn:7005/gx-eams/Actions/Net/Internal/NetService/ApplyOnlineEduAction.do?method=getOnlinePayInfo&flag=201014085351416')
 
-time.sleep(3)
+time.sleep(1)
 
 wd.find_element_by_id('cb_only_show_selected').click()
 
-wd.get('https://ce.esnai.net/c/accguangxi/study.jsp?tid=3736&code=ZFKJZZZDJJ')
+#开始选课
+links=wd.find_elements_by_css_selector('.black12 td img[src*="/images"]')
+for link in links:
+    print(link.get_attribute('outerHTML'))
+    if link.get_attribute('title') =="尚未开始学习" or "学习进度尚不足一半，请加油！":
+        print("找到目标")
+        linkbrother=link.find_element_by_xpath("./../../td[last()]/a")
+        print(linkbrother.get_attribute('outerHTML'))
+        linkbrother.click()
+        break
+    else:
+        print("未找到目标")
 
-wd.get('https://ce.esnai.net/c/public/showflashvideo.jsp?type=1&cwid=3659&tid=3736')
 
-print(wd.title)
+# mainWindow变量保存当前窗口的句柄
+mainWindow = wd.current_window_handle
+
+print('进入播放列表')
+wd.find_element_by_css_selector('a[name=courseurl]').click()
+
+for handle in wd.window_handles:
+    # 先切换到该窗口
+    wd.switch_to.window(handle)
+    # 得到该窗口的标题栏字符串，判断是不是我们要操作的那个窗口
+    if '上海国家会计学院远程教育网' == wd.title:
+        # 如果是，那么这时候WebDriver对象就是对应的该该窗口，正好，跳出循环，
+        break
+wd.switch_to.window(handle)
+
+
+#开始播放
 
 wd.find_element_by_css_selector('.pv-controls-left button').click()
-
 wd.find_element_by_css_selector('.pv-controls-right .pv-volumebtn').click()
+
+
 #弹窗处理
 def alert():
     print('正在执行弹窗0')
